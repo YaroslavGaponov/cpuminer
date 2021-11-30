@@ -88,20 +88,25 @@ func byteToHex(b byte) string {
 	return string(hextable[b>>4]) + string(hextable[b&0x0f])
 }
 
-func mineOne(done chan string, version uint32, prevBlockHash string, merkleRoot string, time uint32, bits uint32, nonce uint32) {
+type Result struct {
+	Hash  string
+	Nonce uint32
+}
+
+func mineOne(done chan Result, version uint32, prevBlockHash string, merkleRoot string, time uint32, bits uint32, nonce uint32) {
 	hash, _ := CalcHash(version, prevBlockHash, merkleRoot, time, bits, nonce)
 	if strings.HasPrefix(hash, "0000000000000000") {
-		done <- hash
+		done <- Result{Hash: hash, Nonce: nonce}
 	}
 }
 
-func Mine(progress func(start, end, current uint32), version uint32, prevBlockHash string, merkleRoot string, time uint32, bits uint32, nonceStart uint32, nonceEnd uint32) (string, error) {
-	done := make(chan string)
+func Mine(progress func(start, end, current uint32), version uint32, prevBlockHash string, merkleRoot string, time uint32, bits uint32, nonceStart uint32, nonceEnd uint32) (string, uint32, error) {
+	done := make(chan Result)
 
 	for nonce := nonceStart; nonce < nonceEnd; nonce++ {
 		select {
-		case hash := <-done:
-			return hash, nil
+		case result := <-done:
+			return result.Hash, result.Nonce, nil
 		default:
 			progress(nonceStart, nonceEnd, nonce)
 			go mineOne(done, version, prevBlockHash, merkleRoot, time, bits, nonce)
@@ -109,9 +114,9 @@ func Mine(progress func(start, end, current uint32), version uint32, prevBlockHa
 	}
 
 	select {
-	case hash := <-done:
-		return hash, nil
+	case result := <-done:
+		return result.Hash, result.Nonce, nil
 	case <-t.After(t.Second * 10):
-		return "", errNotFound
+		return "", 0, errNotFound
 	}
 }

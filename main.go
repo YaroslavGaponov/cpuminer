@@ -49,9 +49,9 @@ func main() {
 	var start, end uint32 = 2400000000, 2600000000
 	fmt.Printf("Mining nonce from %d to %d\n", start, end)
 
-	if hash, err := cpuminer.Mine(progress(), block.Version, block.PrevBlockHash, block.MerkleRoot, block.Time, block.Bits, start, end); err != nil {
+	if hash, nonce, err := cpuminer.Mine(progress(), block.Version, block.PrevBlockHash, block.MerkleRoot, block.Time, block.Bits, start, end); err != nil {
 		fmt.Println(err)
 	} else {
-		fmt.Println("\nFound hash is ", hash)
+		fmt.Printf("\nHash is %s\nNonce is %d", hash, nonce)
 	}
 }
