@@ -22,40 +22,40 @@ type Block struct {
 	Nonce         uint32 `json:"nonce"`
 }
 
-func CalcHash(block *Block) error {
+func CalcHash(block Block, nonce uint32) (string, error) {
 
 	if len(block.PrevBlockHash) != 64 {
-		return errBadBlock
+		return "", errBadBlock
 	}
 
 	if len(block.MerkleRoot) != 64 {
-		return errBadBlock
+		return "", errBadBlock
 	}
 
 	var header [80]byte
 
-	putUint32(header[:], uint32(block.Version))
+	putUint32(header[:], block.Version)
 	putHashString(header[4:], block.PrevBlockHash)
 	putHashString(header[36:], block.MerkleRoot)
-	putUint32(header[68:], uint32(block.Time))
-	putUint32(header[72:], uint32(block.Bits))
-	putUint32(header[76:], uint32(block.Nonce))
+	putUint32(header[68:], block.Time)
+	putUint32(header[72:], block.Bits)
+	putUint32(header[76:], nonce)
 
 	h := sha256.New()
 	if _, err := h.Write(header[:]); err != nil {
-		return err
+		return "", err
 	}
 
 	h2 := sha256.New()
 	if _, err := h2.Write(h.Sum(nil)); err != nil {
-		return err
+		return "", err
 	}
 
 	bytes := h2.Sum(nil)
 
-	block.Hash = encodeToString(bytes)
+	hash := encodeToString(bytes)
 
-	return nil
+	return hash, nil
 }
 
 func putUint32(b []byte, v uint32) {

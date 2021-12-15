@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/YaroslavGaponov/cpuminer/internal/miner"
 	"github.com/YaroslavGaponov/cpuminer/pkg/bitcoin"
 )
@@ -17,8 +19,10 @@ func main() {
 		Nonce:         2504433986,
 	}
 
-	m := miner.New(&block)
-	if err := m.Mine(2400000000, 2600000000); err != nil {
-		panic(err)
+	m := miner.New(block)
+	if nonce, err := m.Mine(2400000000, 2600000000); err != nil {
+		fmt.Printf("Error %v", err)
+	} else {
+		fmt.Printf("Nonce is %d", nonce)
 	}
 }
