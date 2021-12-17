@@ -38,6 +38,5 @@ func (bar *ProgressBar) Update(current int) {
 }
 
 func (bar *ProgressBar) Done() {
-	bar.Update(bar.max)
 	fmt.Println()
 }

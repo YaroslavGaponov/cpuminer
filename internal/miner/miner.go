@@ -25,11 +25,12 @@ func New(block bitcoin.Block, zbits int) *Miner {
 }
 
 func (m *Miner) mine(block bitcoin.Block, in chan uint32, out chan uint32) {
+	bc := bitcoin.New(block)
 main:
 	for {
 		select {
 		case nonce := <-in:
-			if hash, err := bitcoin.CalcHash(block, nonce); err == nil {
+			if hash, err := bc.CalcHash(nonce); err == nil {
 				for i, j := 0, len(hash)-1; i < m.zbytes; i, j = i+1, j-1 {
 					if hash[j] != 0 {
 						continue main

@@ -2,41 +2,30 @@ package bitcoin
 
 import (
 	"crypto/sha256"
-	"errors"
-)
-
-const hextable = "0123456789abcdef"
-
-var (
-	errBadBlock = errors.New("bad block")
-	errNotFound = errors.New("not found")
 )
 
 type Block struct {
-	Hash          string `json:"hash"`
 	Version       uint32 `json:"ver"`
 	PrevBlockHash string `json:"prev_hash"`
+	prevBlockHash []byte
 	MerkleRoot    string `json:"mrkl_root"`
+	merkleRoot    []byte
 	Time          uint32 `json:"time"`
 	Bits          uint32 `json:"bits"`
-	Nonce         uint32 `json:"nonce"`
 }
 
-func CalcHash(block Block, nonce uint32) ([]byte, error) {
+func New(block Block) *Block {
+	block.prevBlockHash = getHashBytes(block.PrevBlockHash)
+	block.merkleRoot = getHashBytes(block.MerkleRoot)
+	return &block
+}
 
-	if len(block.PrevBlockHash) != 64 {
-		return nil, errBadBlock
-	}
-
-	if len(block.MerkleRoot) != 64 {
-		return nil, errBadBlock
-	}
-
+func (block *Block) CalcHash(nonce uint32) ([]byte, error) {
 	var header [80]byte
 
 	putUint32(header[:], block.Version)
-	putHashString(header[4:], block.PrevBlockHash)
-	putHashString(header[36:], block.MerkleRoot)
+	putHash(header[4:], block.prevBlockHash)
+	putHash(header[36:], block.merkleRoot)
 	putUint32(header[68:], block.Time)
 	putUint32(header[72:], block.Bits)
 	putUint32(header[76:], nonce)
@@ -63,9 +52,17 @@ func putUint32(b []byte, v uint32) {
 	b[0] = byte(v)
 }
 
-func putHashString(r []byte, s string) {
+func getHashBytes(s string) []byte {
+	r := make([]byte, len(s)/2)
 	for i, j := len(s)-1, 0; i > 0; i, j = i-2, j+1 {
 		r[j] = (hexToByte(s[i-1]) << 4) | hexToByte(s[i])
+	}
+	return r
+}
+
+func putHash(r []byte, h []byte) {
+	for i := 0; i < len(h); i++ {
+		r[i] = h[i]
 	}
 }
 
