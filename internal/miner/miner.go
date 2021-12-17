@@ -3,7 +3,6 @@ package miner
 import (
 	"errors"
 	"runtime"
-	"strings"
 
 	"github.com/YaroslavGaponov/cpuminer/pkg/bitcoin"
 	"github.com/YaroslavGaponov/cpuminer/pkg/progressbar"
@@ -12,23 +11,34 @@ import (
 var errNotFound = errors.New("hash is not found")
 
 type Miner struct {
-	block bitcoin.Block
+	zbytes int
+	zbits  int
+	block  bitcoin.Block
 }
 
-func New(block bitcoin.Block) *Miner {
+func New(block bitcoin.Block, zbits int) *Miner {
 	return &Miner{
-		block: block,
+		zbytes: zbits / 8,
+		zbits:  zbits % 8,
+		block:  block,
 	}
 }
 
-func mine(block bitcoin.Block, in chan uint32, out chan uint32) {
+func (m *Miner) mine(block bitcoin.Block, in chan uint32, out chan uint32) {
+main:
 	for {
 		select {
 		case nonce := <-in:
 			if hash, err := bitcoin.CalcHash(block, nonce); err == nil {
-				if strings.HasPrefix(hash, "0000000000000000") {
-					out <- nonce
+				for i, j := 0, len(hash)-1; i < m.zbytes; i, j = i+1, j-1 {
+					if hash[j] != 0 {
+						continue main
+					}
 				}
+				if (hash[len(hash)-m.zbytes-1] >> m.zbits) != 0 {
+					continue main
+				}
+				out <- nonce
 			}
 		}
 	}
@@ -42,7 +52,7 @@ func (m *Miner) Mine(from, to uint32) (uint32, error) {
 	in := make(chan uint32)
 	out := make(chan uint32)
 	for i := 0; i < runtime.NumCPU()<<1; i++ {
-		go mine(m.block, in, out)
+		go m.mine(m.block, in, out)
 	}
 
 	for nonce := from; nonce < to; nonce++ {

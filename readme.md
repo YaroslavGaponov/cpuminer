@@ -19,13 +19,15 @@ CPU bitcoin miner
 ## Run
 
 ```sh
-go run cmd/miner/main.go --file=example.json --from=2400000000 --to=2600000000
+go run cmd/miner/main.go --file=example.json --from=2400000000 --to=2600000000 --zerobits=52
 ```
 
 
 ## Result
 
 ```
-Mining[====================================================================================================>100%
-Nonce is 2504433986  
+Nonce from 2400000000 to 2600000000, zerobits is 52
+
+Mining ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓ 100%
+Nonce is 2504433986
 ```

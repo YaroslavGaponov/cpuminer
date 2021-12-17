@@ -16,6 +16,7 @@ func main() {
 	fileName := flag.String("file", "", "file with block")
 	from := flag.Uint("from", 0, "nonce from")
 	to := flag.Uint("to", math.MaxUint32, "nonce to")
+	zerobites := flag.Int("zerobites", 13*4, "zerobites")
 
 	flag.Parse()
 
@@ -29,9 +30,9 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("Nonce from %d to %d\n", *from, *to)
+	fmt.Printf("Nonce from %d to %d, zerobits is %d\n", *from, *to, *zerobites)
 
-	m := miner.New(block)
+	m := miner.New(block, *zerobites)
 	if nonce, err := m.Mine(uint32(*from), uint32(*to)); err != nil {
 		fmt.Printf("Error %v", err)
 	} else {

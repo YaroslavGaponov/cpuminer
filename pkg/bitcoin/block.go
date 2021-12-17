@@ -22,14 +22,14 @@ type Block struct {
 	Nonce         uint32 `json:"nonce"`
 }
 
-func CalcHash(block Block, nonce uint32) (string, error) {
+func CalcHash(block Block, nonce uint32) ([]byte, error) {
 
 	if len(block.PrevBlockHash) != 64 {
-		return "", errBadBlock
+		return nil, errBadBlock
 	}
 
 	if len(block.MerkleRoot) != 64 {
-		return "", errBadBlock
+		return nil, errBadBlock
 	}
 
 	var header [80]byte
@@ -43,17 +43,15 @@ func CalcHash(block Block, nonce uint32) (string, error) {
 
 	h := sha256.New()
 	if _, err := h.Write(header[:]); err != nil {
-		return "", err
+		return nil, err
 	}
 
 	h2 := sha256.New()
 	if _, err := h2.Write(h.Sum(nil)); err != nil {
-		return "", err
+		return nil, err
 	}
 
-	bytes := h2.Sum(nil)
-
-	hash := encodeToString(bytes)
+	hash := h2.Sum(nil)
 
 	return hash, nil
 }
@@ -71,14 +69,6 @@ func putHashString(r []byte, s string) {
 	}
 }
 
-func encodeToString(b []byte) string {
-	var s string
-	for i := len(b) - 1; i >= 0; i-- {
-		s += byteToHex(b[i])
-	}
-	return s
-}
-
 func hexToByte(c byte) byte {
 	if c >= '0' && c <= '9' {
 		return c - '0'
@@ -90,8 +80,4 @@ func hexToByte(c byte) byte {
 		return c - 'A' + 10
 	}
 	return 0
-}
-
-func byteToHex(b byte) string {
-	return string(hextable[b>>4]) + string(hextable[b&0x0f])
 }

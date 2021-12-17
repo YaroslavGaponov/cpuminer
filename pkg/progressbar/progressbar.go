@@ -5,6 +5,8 @@ import (
 	"strings"
 )
 
+const ProgressBarWidth = 50
+
 type ProgressBar struct {
 	title   string
 	min     int
@@ -30,7 +32,8 @@ func (bar *ProgressBar) Update(current int) {
 	percent := int(float64(current-bar.min) / float64(bar.max-bar.min) * 100)
 	if bar.percent != percent {
 		bar.percent = percent
-		fmt.Printf("\r%s [%s>%s] %d%%", bar.title, strings.Repeat("=", percent), strings.Repeat(" ", 100-percent),percent)
+		width := percent * ProgressBarWidth / 100
+		fmt.Printf("\r%s %s%s %d%%", bar.title, strings.Repeat("▓", width), strings.Repeat("░", ProgressBarWidth-width), percent)
 	}
 }
 
