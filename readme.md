@@ -25,7 +25,7 @@ go run cmd/miner/main.go --file=example.json --from=2400000000 --to=2600000000 -
 
 ## Result
 
-```
+```output
 Nonce from 2400000000 to 2600000000, zerobits is 52
 
 Mining ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░ 52%
