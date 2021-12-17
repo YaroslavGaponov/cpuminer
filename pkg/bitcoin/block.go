@@ -6,7 +6,7 @@ import (
 
 type Block struct {
 	Version       uint32 `json:"ver"`
-	PrevBlockHash string `json:"prev_hash"`
+	PrevBlockHash string `json:"prev_block"`
 	prevBlockHash []byte
 	MerkleRoot    string `json:"mrkl_root"`
 	merkleRoot    []byte

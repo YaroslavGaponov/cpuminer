@@ -4,7 +4,9 @@ CPU bitcoin miner
 
 # Demo
 
-## Demo block in `example.json`
+## Demo block 
+
+### from `example.json` file
 
 ```json
 {
@@ -15,13 +17,23 @@ CPU bitcoin miner
     "bits": 440711666
 }
 ```
+### from url 
+
+`https://blockchain.info/rawblock/00000000000000000009d964cc2beba0a60b2d070b9acbecd1635a09603f2d64`
 
 ## Run
+
+## from file
 
 ```sh
 go run cmd/miner/main.go --file=example.json --from=2400000000 --to=2600000000 --zerobits=52
 ```
 
+## from url
+
+```sh
+go run cmd/miner/main.go --url=https://blockchain.info/rawblock/00000000000000000009d964cc2beba0a60b2d070b9acbecd1635a09603f2d64 --from=2260000000 --to=2270000000
+```
 
 ## Result
 

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math"
+	"net/http"
 
 	"github.com/YaroslavGaponov/cpuminer/internal/miner"
 	"github.com/YaroslavGaponov/cpuminer/pkg/bitcoin"
@@ -14,19 +15,38 @@ import (
 func main() {
 
 	fileName := flag.String("file", "", "file with block")
+	url := flag.String("url", "", "url with block")
 	from := flag.Uint("from", 0, "nonce from")
 	to := flag.Uint("to", math.MaxUint32, "nonce to")
 	zerobites := flag.Int("zerobites", 13*4, "zerobites")
 
 	flag.Parse()
 
-	file, err := ioutil.ReadFile(*fileName)
-	if err != nil {
-		panic(err)
+	var data []byte
+	var err error
+
+	if len(*fileName) > 0 {
+		data, err = ioutil.ReadFile(*fileName)
+		if err != nil {
+			panic(err)
+		}
+	} else if len(*url) > 0 {
+		resp, err := http.Get(*url)
+		if err != nil {
+			panic(err)
+		}
+		defer resp.Body.Close()
+		data, err = ioutil.ReadAll(resp.Body)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		fmt.Println("You must specify file or url")
+		return
 	}
 
 	var block bitcoin.Block
-	if err := json.Unmarshal(file, &block); err != nil {
+	if err := json.Unmarshal(data, &block); err != nil {
 		panic(err)
 	}
 
