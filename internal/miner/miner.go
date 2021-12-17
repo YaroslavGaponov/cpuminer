@@ -52,7 +52,7 @@ func (m *Miner) Mine(from, to uint32) (uint32, error) {
 
 	in := make(chan uint32)
 	out := make(chan uint32)
-	for i := 0; i < runtime.NumCPU()<<1; i++ {
+	for i := 0; i < runtime.NumCPU()<<2; i++ {
 		go m.mine(m.block, in, out)
 	}
 
