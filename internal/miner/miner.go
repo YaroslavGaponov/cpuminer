@@ -23,6 +23,11 @@ type Task struct {
 	end   uint32
 }
 
+type Result struct {
+	nonce uint32
+	hash  string
+}
+
 func New(block bitcoin.Block, zbits int) *Miner {
 	return &Miner{
 		zbytes: zbits / 8,
@@ -31,12 +36,13 @@ func New(block bitcoin.Block, zbits int) *Miner {
 	}
 }
 
-func (m *Miner) mine(block bitcoin.Block, in chan Task, out chan uint32) {
+func (m *Miner) mine(block bitcoin.Block, in chan Task, out chan Result) {
 	bc := bitcoin.New(block)
 	for {
 		select {
 		case task := <-in:
-			main: for nonce := task.start; nonce < task.end; nonce++ {
+		main:
+			for nonce := task.start; nonce < task.end; nonce++ {
 				if hash, err := bc.CalcHash(nonce); err == nil {
 					for i, j := 0, len(hash)-1; i < m.zbytes; i, j = i+1, j-1 {
 						if hash[j] != 0 {
@@ -46,32 +52,45 @@ func (m *Miner) mine(block bitcoin.Block, in chan Task, out chan uint32) {
 					if (hash[len(hash)-m.zbytes-1] >> m.zbits) != 0 {
 						continue main
 					}
-					out <- nonce
+					out <- Result{nonce: nonce, hash: bytesToHex(hash)}
 				}
 			}
 		}
 	}
 }
 
-func (m *Miner) Mine(from, to uint32) (uint32, error) {
+func (m *Miner) Mine(from, to uint32) (uint32, string, error) {
 	bar := progressbar.New("Mining", int(from), int(to))
 	bar.Begin()
 	defer bar.Done()
 
 	in := make(chan Task)
-	out := make(chan uint32)
+	out := make(chan Result)
 	for i := 0; i < runtime.NumCPU(); i++ {
 		go m.mine(m.block, in, out)
 	}
 
 	for nonce := from; nonce < to; nonce += SIZE {
 		select {
-		case found := <-out:
-			return found, nil
+		case result := <-out:
+			return result.nonce, result.hash, nil
 		default:
 			in <- Task{start: nonce, end: nonce + SIZE}
 			bar.Update(int(nonce))
 		}
 	}
-	return 0, errNotFound
+	return 0, "", errNotFound
+}
+
+func bytesToHex(b []byte) string {
+	var s string
+	for i := len(b) - 1; i >= 0; i-- {
+		s += byteToHex(b[i])
+	}
+	return s
+}
+
+func byteToHex(b byte) string {
+	const hex = "0123456789abcdef"
+	return string(hex[b>>4]) + string(hex[b&0xF])
 }

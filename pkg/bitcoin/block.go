@@ -78,3 +78,4 @@ func hexToByte(c byte) byte {
 	}
 	return 0
 }
+

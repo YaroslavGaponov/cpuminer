@@ -40,6 +40,7 @@ go run cmd/miner/main.go --url=https://blockchain.info/rawblock/0000000000000000
 ```output
 Nonce from 2400000000 to 2600000000, zerobits is 52
 
-Mining ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░ 52%
-Nonce is 2504433986  
+Mining ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░░░░░░░░░ 52% | 7506368 ops/secs
+Nonce is 2504433986
+Hash is 00000000000000001e8d6829a8a21adc5d38d0a473b144b6765798e61f98bd1d
 ```
