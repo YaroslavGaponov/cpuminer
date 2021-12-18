@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"math"
 	"net/http"
+	"time"
 
 	"github.com/YaroslavGaponov/cpuminer/internal/miner"
 	"github.com/YaroslavGaponov/cpuminer/pkg/bitcoin"
@@ -52,6 +53,7 @@ func main() {
 
 	fmt.Printf("Nonce from %d to %d, zerobits is %d\n", *from, *to, *zerobites)
 
+	start := time.Now()
 	m := miner.New(block, *zerobites)
 	if nonce, hash, err := m.Mine(uint32(*from), uint32(*to)); err != nil {
 		fmt.Printf("Error %v", err)
@@ -59,4 +61,5 @@ func main() {
 		fmt.Printf("Nonce is %d\n", nonce)
 		fmt.Printf("Hash is %s\n", hash)
 	}
+	fmt.Printf("Time %v\n", time.Since(start))
 }

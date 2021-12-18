@@ -60,7 +60,7 @@ func (m *Miner) mine(block bitcoin.Block, in chan Task, out chan Result) {
 }
 
 func (m *Miner) Mine(from, to uint32) (uint32, string, error) {
-	bar := progressbar.New("Mining", int(from), int(to))
+	bar := progressbar.New("Mining", from, to)
 	bar.Begin()
 	defer bar.Done()
 
@@ -76,7 +76,7 @@ func (m *Miner) Mine(from, to uint32) (uint32, string, error) {
 			return result.nonce, result.hash, nil
 		default:
 			in <- Task{start: nonce, end: nonce + SIZE}
-			bar.Update(int(nonce))
+			bar.Update(nonce)
 		}
 	}
 	return 0, "", errNotFound
