@@ -18,7 +18,7 @@ func main() {
 	url := flag.String("url", "", "url with block")
 	from := flag.Uint("from", 0, "nonce from")
 	to := flag.Uint("to", math.MaxUint32, "nonce to")
-	zerobites := flag.Int("zerobites", 13*4, "zerobites")
+	zerobites := flag.Int("zerobits", 13*4, "zerobits")
 
 	flag.Parse()
 

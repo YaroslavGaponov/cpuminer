@@ -3,6 +3,7 @@ package progressbar
 import (
 	"fmt"
 	"strings"
+	"time"
 )
 
 const ProgressBarWidth = 50
@@ -12,6 +13,7 @@ type ProgressBar struct {
 	min     int
 	max     int
 	percent int
+	start  time.Time
 }
 
 func New(title string, min, max int) *ProgressBar {
@@ -20,6 +22,7 @@ func New(title string, min, max int) *ProgressBar {
 		min:     min,
 		max:     max,
 		percent: -1,
+		start: time.Now(),
 	}
 }
 
@@ -33,7 +36,8 @@ func (bar *ProgressBar) Update(current int) {
 	if bar.percent != percent {
 		bar.percent = percent
 		width := percent * ProgressBarWidth / 100
-		fmt.Printf("\r%s %s%s %d%%", bar.title, strings.Repeat("▓", width), strings.Repeat("░", ProgressBarWidth-width), percent)
+		speed := int(float64(current-bar.min) / time.Now().Sub(bar.start).Seconds())
+		fmt.Printf("\r%s %s%s %d%% | %d ops/secs", bar.title, strings.Repeat("▓", width), strings.Repeat("░", ProgressBarWidth-width), percent, speed)
 	}
 }
 
