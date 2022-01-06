@@ -8,12 +8,15 @@ import (
 	"math"
 	"net/http"
 	"time"
+	"runtime"
 
 	"github.com/YaroslavGaponov/cpuminer/internal/miner"
 	"github.com/YaroslavGaponov/cpuminer/pkg/bitcoin"
 )
 
 func main() {
+
+	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	fileName := flag.String("file", "", "file with block")
 	url := flag.String("url", "", "url with block")
